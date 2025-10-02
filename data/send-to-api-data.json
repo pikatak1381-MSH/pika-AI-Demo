@@ -1,0 +1,15 @@
+{
+    "conversation_id": 186,
+    "input_message_id": 330,
+    "products": {
+        "product_23213": [
+            {
+                "id": "23213",
+                "name": "ترانسمیتر سطح التراسونیک اندرس هازر FMU40 نو",
+                "originalPrice": 30000,
+                "finalPrice": 28000,
+                "discount": 2000
+            }
+        ]
+    }
+}

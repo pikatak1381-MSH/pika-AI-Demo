@@ -1,0 +1,35 @@
+{
+  "context": "سلام یه کنترل ولو فیشر می‌خواستم که یک اینچ باشه",
+  "input_message_id": 340,
+  "conversation_id": 193,
+  "input_type": "text",
+  "created_at": "2025-08-23T12:34:06.984055Z",
+  "products": [
+    {
+      "category": "کنترل ولو فیشر",
+      "offers": [
+        {
+          "id": "12027",
+          "name": "کنترل ولو فیشر سایز \"1 کلاس 300",
+          "original_price": 60000000,
+          "final_price": 60000000,
+          "discount": 0
+        },
+        {
+          "id": "12028",
+          "name": "کنترل ولو فیشرسری 667 سایز \"1",
+          "original_price": 90000000,
+          "final_price": 90000000,
+          "discount": 0
+        },
+        {
+          "id": "12030",
+          "name": "کنترل ولو فیشر کلاس 600 سایز \"1",
+          "original_price": 150000000,
+          "final_price": 150000000,
+          "discount": 0
+        }
+      ]
+    }
+  ]
+}

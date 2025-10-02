@@ -1,0 +1,477 @@
+{
+    "context": "تست",
+    "input_message_id": 439,
+    "conversation_id": 276,
+    "input_type": "text",
+    "created_at": "2025-08-27T08:14:07.722432Z",
+    "products": [
+        {
+            "category": "اکچویتور پنوماتیک",
+            "offers": [
+                {
+                    "id": "10848",
+                    "name": "اکچویتور پنوماتیکی Euro Valve ",
+                    "original_price": 20000000,
+                    "final_price": 16000,
+                    "discount": 19984000,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "انگلیس",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "در حد نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "گارانتی با پرداخت هزینه",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "اکچویتور",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "پنوماتیکی-دورانی (Rack and Pinion)",
+                            "AttributeName": "نوع اکچویتور"
+                        },
+                        {
+                            "Value": "Double Acting",
+                            "AttributeName": "عملکرد"
+                        },
+                        {
+                            "Value": "200",
+                            "AttributeName": "سایز"
+                        },
+                        {
+                            "Value": "℃80⁓℃20-\t",
+                            "AttributeName": "دمای کاری"
+                        },
+                        {
+                            "Value": "8bar",
+                            "AttributeName": "فشار کاری"
+                        },
+                        {
+                            "Value": "سولنوئید ولو",
+                            "AttributeName": "تجهیزات جانبی"
+                        },
+                        {
+                            "Value": "Ex",
+                            "AttributeName": "تاییدیه ها و استانداردها"
+                        }
+                    ]
+                },
+                {
+                    "id": "10852",
+                    "name": "اکچویتور پنوماتیکی دابل اکت euro valve",
+                    "original_price": 0,
+                    "final_price": 0,
+                    "discount": 0,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "انگلیس",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "گارانتی با پرداخت هزینه",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "اکچویتور",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "پنوماتیکی-دورانی (Rack and Pinion)",
+                            "AttributeName": "نوع اکچویتور"
+                        },
+                        {
+                            "Value": "ON/OFF",
+                            "AttributeName": "عملکرد"
+                        },
+                        {
+                            "Value": "Double Acting",
+                            "AttributeName": "عملکرد"
+                        },
+                        {
+                            "Value": "100",
+                            "AttributeName": "سایز"
+                        },
+                        {
+                            "Value": "℃80⁓℃20-\t",
+                            "AttributeName": "دمای کاری"
+                        },
+                        {
+                            "Value": "8bar",
+                            "AttributeName": "فشار کاری"
+                        },
+                        {
+                            "Value": "لیمیت سوئیچ",
+                            "AttributeName": "تجهیزات جانبی"
+                        },
+                        {
+                            "Value": "سولنوئید ولو",
+                            "AttributeName": "تجهیزات جانبی"
+                        },
+                        {
+                            "Value": "Ex",
+                            "AttributeName": "تاییدیه ها و استانداردها"
+                        },
+                        {
+                            "Value": "سایر توضیحات",
+                            "AttributeName": "سایر  توضیحات"
+                        }
+                    ]
+                },
+                {
+                    "id": "10857",
+                    "name": "اکچویتور پنوماتیکی الوماتیک فنر برگشتی",
+                    "original_price": 0,
+                    "final_price": 0,
+                    "discount": 0,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "آمریکا",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "در حد نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "گارانتی با پرداخت هزینه",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "اکچویتور",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "پنوماتیکی-دورانی (Rack and Pinion)",
+                            "AttributeName": "نوع اکچویتور"
+                        },
+                        {
+                            "Value": "ON/OFF",
+                            "AttributeName": "عملکرد"
+                        },
+                        {
+                            "Value": "Spring Return(فنر برگشتی)",
+                            "AttributeName": "عملکرد"
+                        },
+                        {
+                            "Value": "600",
+                            "AttributeName": "سایز"
+                        },
+                        {
+                            "Value": "℃80⁓℃20-\t",
+                            "AttributeName": "دمای کاری"
+                        },
+                        {
+                            "Value": "8bar",
+                            "AttributeName": "فشار کاری"
+                        },
+                        {
+                            "Value": "لیمیت سوئیچ",
+                            "AttributeName": "تجهیزات جانبی"
+                        },
+                        {
+                            "Value": "سولنوئید ولو",
+                            "AttributeName": "تجهیزات جانبی"
+                        },
+                        {
+                            "Value": "Ex",
+                            "AttributeName": "تاییدیه ها و استانداردها"
+                        },
+                        {
+                            "Value": "سایر توضیحات",
+                            "AttributeName": "سایر  توضیحات"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "category": "ترانسمیتر سطح اختلاف فشاری",
+            "offers": [
+                {
+                    "id": "10207",
+                    "name": "مغزی ترانسمیتر سطح خازنی اندرس هاوزر مدل EC37Z",
+                    "original_price": 25000000,
+                    "final_price": 25000000,
+                    "discount": 0,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "آلمان ",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "در حد نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "گارانتی با پرداخت هزینه",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "ترانسمیتر سطح راداری اندرس هاوزر مدل FMP54",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "خازنی",
+                            "AttributeName": "نوع ترانسمیتر"
+                        },
+                        {
+                            "Value": "پلاستیک",
+                            "AttributeName": "متریال بدنه(Housing)"
+                        },
+                        {
+                            "Value": "سایر توضیحات",
+                            "AttributeName": "سایر  توضیحات"
+                        }
+                    ]
+                },
+                {
+                    "id": "14865",
+                    "name": "ترانسمیتر سطح التراسونیک اندرس هاوزر مدل FMU42",
+                    "original_price": 140000000,
+                    "final_price": 140000000,
+                    "discount": 0,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "آلمان ",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "دارد",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "ترانسمیتر سطح راداری اندرس هاوزر مدل FMP54",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "التراسونیک",
+                            "AttributeName": "نوع ترانسمیتر"
+                        },
+                        {
+                            "Value": "10m",
+                            "AttributeName": "رنج اندازه گیری"
+                        },
+                        {
+                            "Value": "دارد",
+                            "AttributeName": "نمایشگر"
+                        },
+                        {
+                            "Value": "87mm",
+                            "AttributeName": "طول سنسور"
+                        },
+                        {
+                            "Value": "PTFE",
+                            "AttributeName": "متریال سنسور(Wetted part)"
+                        },
+                        {
+                            "Value": " Aluminum",
+                            "AttributeName": "متریال بدنه(Housing)"
+                        },
+                        {
+                            "Value": "Flange",
+                            "AttributeName": "نوع اتصال"
+                        },
+                        {
+                            "Value": "PTFE (تفلون)",
+                            "AttributeName": "متریال اتصال"
+                        },
+                        {
+                            "Value": "14-35Vdc",
+                            "AttributeName": "منبع تغذیه/برق"
+                        },
+                        {
+                            "Value": " 4-20mA (HART)",
+                            "AttributeName": "خروجی/پروتکل ارتباطی"
+                        },
+                        {
+                            "Value": "مایعات",
+                            "AttributeName": "کاربرد"
+                        },
+                        {
+                            "Value": "جامدات پودری",
+                            "AttributeName": "کاربرد"
+                        },
+                        {
+                            "Value": "IP68",
+                            "AttributeName": "درجه حفاظتی بدنه(IP)"
+                        },
+                        {
+                            "Value": "Ex i",
+                            "AttributeName": "تائیدیه ضدانفجار"
+                        }
+                    ]
+                },
+                {
+                    "id": "13440",
+                    "name": "ترانسمیتر سطح اختلاف فشاری روزمونت مدل 3051CD2",
+                    "original_price": 150000000,
+                    "final_price": 150000000,
+                    "discount": 0,
+                    "specifications": [
+                        {
+                            "Value": "تخفیف دارد",
+                            "AttributeName": "وضعیت تخفیف"
+                        },
+                        {
+                            "Value": "آمریکا",
+                            "AttributeName": "کشور سازنده"
+                        },
+                        {
+                            "Value": "نو",
+                            "AttributeName": "وضیعت محصول"
+                        },
+                        {
+                            "Value": "اصلی",
+                            "AttributeName": "اصالت جنس"
+                        },
+                        {
+                            "Value": "گارانتی با پرداخت هزینه",
+                            "AttributeName": "گارانتی"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "مرجوعی"
+                        },
+                        {
+                            "Value": "بصورت پسکرایه",
+                            "AttributeName": "روش های ارسال "
+                        },
+                        {
+                            "Value": "لول ترانسمیتر اختلاف فشار روزمونت مدل 1151",
+                            "AttributeName": "مدل و سازنده"
+                        },
+                        {
+                            "Value": "اختلاف فشاری",
+                            "AttributeName": "نوع ترانسمیتر"
+                        },
+                        {
+                            "Value": "دارد",
+                            "AttributeName": "نمایشگر"
+                        },
+                        {
+                            "Value": "آلومینیوم",
+                            "AttributeName": "متریال بدنه"
+                        },
+                        {
+                            "Value": "فلنجی(Flange)",
+                            "AttributeName": "نوع اتصال"
+                        },
+                        {
+                            "Value": "SS 316L",
+                            "AttributeName": "متریال اتصال(کانکشن)"
+                        },
+                        {
+                            "Value": "\"4",
+                            "AttributeName": "سایز فلنج (High Pressure)"
+                        },
+                        {
+                            "Value": "CL150",
+                            "AttributeName": "ریتینگ فشار فلنج (High Pressure)"
+                        },
+                        {
+                            "Value": "ندارد",
+                            "AttributeName": "تائیدیه ضدانفجار"
+                        },
+                        {
+                            "Value": "سایر توضیحات",
+                            "AttributeName": "سایر  توضیحات"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

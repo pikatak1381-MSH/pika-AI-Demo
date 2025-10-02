@@ -1,0 +1,48 @@
+{
+    "specifications": [
+        {
+            "value": "تایوان",
+            "attribute": "کشور سازنده"
+        },
+        {
+            "value": "دو ساله",
+            "attribute": "گارانتی"
+        },
+        {
+            "value": "---",
+            "attribute": "مرجوعی"
+        },
+        {
+            "value": "دارد",
+            "attribute": "مرجوعی"
+        },
+        {
+            "value": "---",
+            "attribute": "روش های ارسال"
+        },
+        {
+            "value": "ارسال رایگان در سرتاسر ایران",
+            "attribute": "روش های ارسال"
+        },
+        {
+            "value": "9-35V DC",
+            "attribute": "ولتاژ"
+        },
+        {
+            "value": "آلومینیوم",
+            "attribute": "متریال بدنه"
+        },
+        {
+            "value": "FOUNDATION Fieldbus",
+            "attribute": "پروتکل ارتباطی"
+        },
+        {
+            "value": "ندارد",
+            "attribute": "تاییدیه ضدانفجار (Ex)"
+        },
+        {
+            "value": "IP68",
+            "attribute": "درجه حفاظتی بدنه (IP)"
+        }
+    ]
+}
