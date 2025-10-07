@@ -2,59 +2,59 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
-import Image from "next/image"
+import { Copy, CopyCheck } from "lucide-react"
 
 interface CopyButtonProps {
     message: string
     index: number
 }
 
+const CopyButton: React.FC<CopyButtonProps> = ({ message }) => {
+    const [isCopied, setIsCopied] = useState(false)
 
-const CopyButton: React.FC<CopyButtonProps> = ({ message, index }) => {
-    const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
-
-    const handleCopy = async (text: string, index: number) => {
+    const handleCopy = async (text: string) => {
         try {
             await navigator.clipboard.writeText(text)
-            setCopiedIndex(index)
+            setIsCopied(true)
             setTimeout(() => {
-                setCopiedIndex(null)
-        }, 2000)
+                setIsCopied(false)
+            }, 2000)
         } catch (error) {
             console.error("Failed to copy", error)
         }
-  }
+    }
+
   return (
-    <AnimatePresence>
-        <motion.button
-            className="absolute -bottom-8 left-0 items-center gap-1 mb-1 rounded-lg hover:shadow-lg hover:p-1 transition-all cursor-pointer z-20"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            onClick={() => handleCopy(message, index)}
-        >
-        {copiedIndex === index ? (
-            <>
-                <Image 
-                    src="/icons/check-icon.svg"
-                    alt="copy icon"
-                    width={24}
-                    height={24}
-                />
-            </>
-        ) : (
-            <>
-                <Image 
-                    src="/icons/copy-icon.svg"
-                    alt="check icon"
-                    width={24}
-                    height={24}
-                />
-            </>
-        )}
-        </motion.button>
-    </AnimatePresence>
+    <motion.button
+        className="absolute -bottom-8 left-0 items-center gap-1 mb-1 rounded-lg hover:shadow-md hover:p-0.5 transition-all cursor-pointer z-20"
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 4 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        onClick={() => handleCopy(message)}
+    >
+        <AnimatePresence mode="wait">
+            {isCopied ? (
+                <motion.div
+                    key="check"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                >
+                    <CopyCheck size={22}/>
+                </motion.div>
+            ) : (
+                <motion.div
+                    key="copy"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                >
+                    <Copy size={22}/>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    </motion.button>
   )
 }
 

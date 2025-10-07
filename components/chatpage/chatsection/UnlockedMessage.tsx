@@ -61,7 +61,7 @@ const UnlockedMessage: React.FC<UnlockedMessageProps> = ({ response, messageId }
       {response.offered_product_answer.length > 0 && (
         <>
           <motion.div
-            className="relative w-full my-4 p-3 border-y-2 border-gray-200"
+            className="relative w-full my-6 p-6 border-y-2 border-gray-200"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}

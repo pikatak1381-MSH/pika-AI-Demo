@@ -33,10 +33,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages }) => {
           >
             {msg.role === "user" && typeof msg.content === "string" ? (
               <div
-                className="w-fit relative my-6"
+                className="w-fit relative my-12"
               >
                 <p 
-                  className="rounded-2xl p-3.5 bg-[#E5E5E5] self-start"
+                  className="rounded-2xl p-3.5 bg-[#E5E5E5] self-start text-wrap"
                 >
                   {msg.content}
                 </p>
