@@ -1,117 +1,118 @@
-"use client"
+// hooks/useConversations.ts
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useRef } from 'react'
 
-import { useAuthStore } from "@/stores/useAuthStore"
-import { useInfiniteQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
-
-export interface UserConversation {
-  conversation_id: number
+interface Conversation {
   user_id: string
+  conversation_id: number
   created_at: string
   updated_at: string
 }
 
-interface ConversationsResponse {
-  data: UserConversation[]
-  pagination: {
-    skip: number
-    limit: number
-    total: number
-    hasMore: boolean
-  }
+interface PaginationInfo {
+  skip: number
+  limit: number
+  total_conversations: number
+  has_more: boolean
 }
 
-const CONVERSATIONS_PER_PAGE = 20
+interface ConversationResponse {
+  user_conversations: Conversation[]
+  pagination: PaginationInfo
+}
 
-export const useAllUserConversations = () => {
-  const { userId } = useAuthStore()
+interface ConversationRequest {
+  user_id: string
+  skip: number
+  limit: number
+  total_conversations: number | null
+}
 
-  return useInfiniteQuery<ConversationsResponse>({
-    queryKey: ["userConversations", userId],
-    
-    queryFn: async ({ pageParam }) => {
-      if (!userId) throw new Error("User ID is required") 
+interface UseConversationsOptions {
+  user_id: string | undefined
+  limit?: number
+  enabled?: boolean
+}
 
-        const skip = (pageParam as number) ?? 0
+export function useAllUserConversations({
+  user_id,
+  limit = 10,
+  enabled = true,
+}: UseConversationsOptions) {
+  // Store total_conversations across requests
+  const totalConversationsRef = useRef<number | null>(null)
 
-        /* Temp Debugg Log */
-        console.log("Fetching conversations:", { skip, limit: CONVERSATIONS_PER_PAGE, userId })
+  const query = useInfiniteQuery({
+    queryKey: ['conversations', user_id],
+    queryFn: async ({ pageParam = 0 }) => {
+      // This should never happen due to enabled check, but TypeScript safety
+      if (!user_id) {
+        throw new Error('User ID is required')
+      }
 
-        const res = await fetch(
-            `/api/chat/user-conversations/${userId}?skip=${skip}&limit=${CONVERSATIONS_PER_PAGE}`,
-            {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            // Preventing caching issues
-            cache: "no-store",
-            }
-        )
+      const body: ConversationRequest = {
+        user_id,
+        skip: pageParam,
+        limit,
+        // Send null on first request, then send the total from backend
+        total_conversations: totalConversationsRef.current,
+      }
 
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}))
-            throw new Error(
-            errorData.error || `Failed to fetch conversations: ${res.status}`
-            )
-        }
+      const response = await fetch('/api/chat/user-conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
 
-        const data = await res.json()
-        /* Temp Debugg Log */
-        console.log("Recieved data:", {
-            conversationsCount: data.data?.length,
-            pagination: data.pagination
-        })
-        return data
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail?.[0]?.msg || 'Failed to fetch conversations')
+      }
+
+      const data: ConversationResponse = await response.json()
+
+      // Store total_conversations for subsequent requests
+      if (data.pagination.total_conversations !== undefined) {
+        totalConversationsRef.current = data.pagination.total_conversations
+      }
+
+      return data
     },
-
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => {
-        const nextParam = lastPage.pagination.hasMore 
-            ? lastPage.pagination.skip + lastPage.pagination.limit 
-            : undefined
-        
-        console.log("📄 getNextPageParam:", {
-            hasMore: lastPage.pagination.hasMore,
-            currentSkip: lastPage.pagination.skip,
-            limit: lastPage.pagination.limit,
-            nextParam
-        })
+      // If has_more is false, return undefined to stop pagination
+      if (!lastPage.pagination.has_more) {
+        return undefined
+      }
+
+      // Calculate next skip value
+      const nextSkip = lastPage.pagination.skip + lastPage.pagination.limit
       
-        return nextParam
+      return nextSkip
     },
-        initialPageParam: 0,
-        enabled: !!userId,
-        staleTime: 30_000, // 30 seconds
-        gcTime: 5 * 60_000, // 5 minutes (formerly cacheTime)
-        refetchOnWindowFocus: false,
-        retry: 2,
-    })
-}
+    enabled: enabled && !!user_id, // Only fetch when user_id exists
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+  })
 
-// Helper hook to flatten all conversations
-export const useAllConversations = () => {
-    const query = useAllUserConversations()
-    
-    const allConversations = query.data?.pages.flatMap(page => page.data) ?? []
-    const totalCount = query.data?.pages[0]?.pagination.total ?? 0
+  // Flatten all pages into a single array
+  const allConversations =
+    query.data?.pages.flatMap((page) => page.user_conversations) ?? []
 
-  // Debug logging
-  useEffect(() => {
-    console.log("📊 Conversations state:", {
-      loadedConversations: allConversations.length,
-      totalCount,
-      hasNextPage: query.hasNextPage,
-      isFetchingNextPage: query.isFetchingNextPage,
-      pagesLoaded: query.data?.pages.length
-    })
-  }, [allConversations.length, totalCount, query.hasNextPage, query.isFetchingNextPage, query.data?.pages.length])    
-  
-    return {
-        ...query,
-        conversations: allConversations,
-        totalCount,
-        isLoadingMore: query.isFetchingNextPage,
-        loadMore: query.fetchNextPage,
-        canLoadMore: query.hasNextPage,
-    }
+  // Get pagination info from the last page
+  const pagination = query.data?.pages[query.data.pages.length - 1]?.pagination
+
+  return {
+    conversations: allConversations,
+    pagination,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+    isFetchingNextPage: query.isFetchingNextPage,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    refetch: query.refetch,
+  }
 }

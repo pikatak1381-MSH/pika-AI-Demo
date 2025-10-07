@@ -4,6 +4,7 @@ import localFont from "next/font/local"
 import "./globals.css"
 import Providers from "./Providers"
 import { Toaster } from "@/components/ui/sonner"
+import { ModalsHost } from "@/components/ModalsHost"
 
 const interFont = Inter({
   variable: "--font-inter",
@@ -43,6 +44,7 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <ModalsHost />
           <Toaster
             dir="rtl"
             position="bottom-left"

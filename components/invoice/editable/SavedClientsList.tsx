@@ -11,15 +11,15 @@ import { toast } from "sonner"
 import { useState, useRef } from "react"
 import { ClientInfo } from "@/lib/types"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuthStore } from "@/stores/useAuthStore"
+import { useAuthUser } from "@/stores/useAuthStore"
 
 
 const SavedClientsList = () => {
     const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
     const [open, setOpen] = useState(false)
     const triggerRef = useRef<HTMLButtonElement | null>(null)
-    const { userId } = useAuthStore()
-    const { data: clients, isLoading } = useGetClients(userId)
+    const user = useAuthUser()
+    const { data: clients, isLoading } = useGetClients(user?.userId)
     const { setClient } = useInvoiceStore()
     const setMode = useFormModeStore((state) => state.setMode)
     const deleteMutation = useDeleteClient()

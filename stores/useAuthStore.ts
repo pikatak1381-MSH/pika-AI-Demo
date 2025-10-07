@@ -1,16 +1,26 @@
-// stores/useAuthStore.ts
 import { create } from "zustand"
 import { persist, createJSONStorage, StateStorage } from "zustand/middleware"
 
-type AuthState = {
-  userId: string | null
-  token: string | undefined
-  email: string | null
+export type AuthUser = {
+  userId: string
+  email: string
   preferredName: string | null
+}
+
+type AuthState = {
+  user: AuthUser | null
+  token: string | null
   expiresAt: string | null
-  setAuth: (data: Partial<AuthState>) => void
+  isHydrated: boolean
+  
+  // Actions
+  setAuth: (data: { user: AuthUser; token: string; expiresAt: string }) => void
   clearAuth: () => void
+  setHydrated: (hydrated: boolean) => void
+  
+  // Computed
   isAuthenticated: () => boolean
+  isTokenExpired: () => boolean
 }
 
 const noopStorage: StateStorage = {
@@ -22,37 +32,53 @@ const noopStorage: StateStorage = {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-        userId: null,
-        token: undefined,
-        email: null,
-        preferredName: null,
+      user: null,
+      token: null,
+      expiresAt: null,
+      isHydrated: false,
+
+      setAuth: (data) => set({
+        user: data.user,
+        token: data.token,
+        expiresAt: data.expiresAt,
+      }),
+
+      clearAuth: () => set({
+        user: null,
+        token: null,
         expiresAt: null,
+      }),
 
-        setAuth: (data) => set(data),
+      setHydrated: (hydrated) => set({ isHydrated: hydrated }),
 
-        clearAuth: () =>
-            set({
-                userId: null,
-                token: undefined,
-                email: null,
-                preferredName: null,
-                expiresAt: null,
-            }),
+      isTokenExpired: () => {
+        const { expiresAt } = get()
+        if (!expiresAt) return true
+        return new Date(expiresAt).getTime() < Date.now()
+      },
 
-        isAuthenticated: () => {
-            const { token, expiresAt } = get()
-            if (!token) return false
-            if (expiresAt && new Date(expiresAt).getTime() < Date.now()) {
-                return false
-            }
-            return true
-            },
-        }),
+      isAuthenticated: () => {
+        const { token, isTokenExpired } = get()
+        return !!token && !isTokenExpired()
+      },
+    }),
     {
-        name: "auth-storage",
-        storage: createJSONStorage(() =>
-            typeof window !== "undefined" ? localStorage : noopStorage
+      name: "auth-storage",
+      storage: createJSONStorage(() =>
+        typeof window !== "undefined" ? localStorage : noopStorage
       ),
+      onRehydrateStorage: () => (state) => {
+        // Auto-clear expired tokens on hydration
+        if (state?.isTokenExpired()) {
+          state.clearAuth()
+        }
+        state?.setHydrated(true)
+      },
     }
   )
 )
+
+// Selector hooks for better performance
+export const useAuthToken = () => useAuthStore((state) => state.token)
+export const useAuthUser = () => useAuthStore((state) => state.user)
+export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated())

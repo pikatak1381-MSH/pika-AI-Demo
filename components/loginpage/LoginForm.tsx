@@ -8,13 +8,12 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { useAuth } from "@/hooks/auth/useAuth"
+import { Eye, EyeOff, LockKeyhole, Mail, Phone } from "lucide-react"
 
 type LoginFormInputs = {
-  email: string
+  identifier: string
   password: string
-  phoneNumber?: string
 }
-
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -23,47 +22,41 @@ const LoginForm = () => {
   const { 
     register, 
     handleSubmit, 
-    formState: { errors } 
+    formState: { errors, isSubmitting } 
   } = useForm<LoginFormInputs>()
 
   const { login, loginStatus } = useAuth()
   const router = useRouter()
 
   const onSubmit = async (data: LoginFormInputs) => {
-    const identifier = loginType === "email" ? data.email : data.phoneNumber!
-
     login(
-      {email: identifier, password: data.password},
+      { email: data.identifier, password: data.password },
       {
         onSuccess: () => {
           toast.success("ورود موفقیت آمیز بود!")
           router.push("/chat")
         },
         onError: (error: unknown) => {
-          const message = error instanceof Error ? error.message : "ورود با مشکل مواجه شد، دوباره تلاش کنید."
+          const message = error instanceof Error 
+            ? error.message 
+            : "ورود با مشکل مواجه شد، دوباره تلاش کنید."
           toast.error(message)
         },
       }
     )
   }
 
+  const isLoading = loginStatus.isPending || isSubmitting
+
   return ( 
     <section
       className="flex-1 flex items-center justify-center bg-white text-[#696969] px-6"
     >
-      <div
-        className="flex flex-col w-[446px]"
-      >
+      <div className="flex flex-col w-full max-w-[446px]">
         {/* Header */}
-        <div
-          className="flex flex-col gap-5 mb-6 self-center md:self-start"
-        >
-          <div
-            className="flex items-center justify-center w-20 h-20 rounded-2xl"
-          >
-            <div
-              className="w-16 h-16"
-            >
+        <div className="flex flex-col gap-5 mb-6 self-center md:self-start">
+          <div className="flex items-center justify-center w-20 h-20 rounded-2xl">
+            <div className="w-16 h-16">
               <Image
                 className="object-cover"
                 src="/logos/pika-ai-logo.png"
@@ -74,9 +67,7 @@ const LoginForm = () => {
               />
             </div>
           </div>
-          <h1
-            className="text-black font-semibold"
-          >
+          <h1 className="text-black font-semibold text-2xl">
             Pika AI 05
           </h1>
         </div>
@@ -85,168 +76,158 @@ const LoginForm = () => {
         <form
           className="w-full flex flex-col gap-7"
           onSubmit={handleSubmit(onSubmit)}
+          noValidate
         >
-          {/* Email or Phone Number*/}
-          <div
-            className="relative w-full"
-          >
+          {/* Email or Phone Number */}
+          <div className="relative w-full">
             <label
-              className="absolute -top-3 right-3 bg-white px-2 rounded-xl"
-              htmlFor={loginType === "email" ? "email" : "phone-number"}
+              className="absolute -top-3 right-3 bg-white px-2 rounded-xl z-10"
+              htmlFor="identifier"
             >
               <AnimatePresence mode="wait">
                 {loginType === "email" ? (
                   <motion.div
-                    className="flex gap-2"
-                    key="emailInput"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }} 
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.3 }}
+                    className="flex gap-2 items-center"
+                    key="emailLabel"
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }} 
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <Image
-                      src="/icons/email-icon.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
+                    <Mail size={20} />
                     ایمیل
                   </motion.div>
                 ) : (
                   <motion.div
-                    className="flex gap-2"
-                    key="phoneNumberInput"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.3 }}
+                    className="flex gap-2 items-center"
+                    key="phoneLabel"
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <Image
-                      src="/icons/phone-icon.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
+                    <Phone size={20} />
                     شماره موبایل
                   </motion.div>                
                 )}
               </AnimatePresence>
             </label>
             <input 
-              className="w-full border border-[#C3C3C3] rounded-2xl h-11 shadow-sm px-6"
-              {...(loginType === "email"
-                ? register("email", { required: "ایمیل را وارد کنید!" })
-                : register("phoneNumber", { required: "شماره موبایل را وارد کنید!" })
-              )}
-              type={loginType === "email" ? "email" : "text"}
-              name={loginType === "email" ? "email" : "phone-number"}
-              id={loginType === "email" ? "email" : "phone-number"}
-              required
+              className={`w-full border ${errors.identifier ? 'border-red-500' : 'border-[#C3C3C3]'} rounded-2xl h-11 shadow-sm px-6 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+              {...register("identifier", { 
+                required: loginType === "email" 
+                  ? "ایمیل را وارد کنید!" 
+                  : "شماره موبایل را وارد کنید!",
+                pattern: loginType === "email" 
+                  ? {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "فرمت ایمیل نامعتبر است"
+                    }
+                  : {
+                      value: /^09\d{9}$/,
+                      message: "شماره موبایل باید با 09 شروع شود و 11 رقم باشد"
+                    }
+              })}
+              type={loginType === "email" ? "email" : "tel"}
+              id="identifier"
+              placeholder={loginType === "email" ? "example@email.com" : "09123456789"}
+              aria-invalid={errors.identifier ? "true" : "false"}
+              aria-describedby={errors.identifier ? "identifier-error" : undefined}
+              disabled={isLoading}
             />
-            {errors.email && (<p className="text-red-500 text-sm mt-1">{errors.email.message}</p>)}
-            {errors.phoneNumber && (<p className="text-red-500 text-sm mt-1">{errors.phoneNumber.message}</p>)}
+            {errors.identifier && (
+              <p 
+                id="identifier-error"
+                className="text-red-500 text-sm mt-1"
+                role="alert"
+              >
+                {errors.identifier.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
-          <div
-            className="relative w-full"
-          >
-            <div>
-              <label
-                className="absolute -top-3 right-3 bg-white px-2 rounded-xl"
-                htmlFor="password"
+          <div className="relative w-full">
+            <label
+              className="absolute -top-3 right-3 bg-white px-2 rounded-xl z-10"
+              htmlFor="password"
+            >
+              <div className="flex gap-2 items-center">
+                <LockKeyhole size={20} />
+                رمز عبور
+              </div>
+            </label>              
+            <input 
+              className={`w-full border ${errors.password ? 'border-red-500' : 'border-[#C3C3C3]'} rounded-2xl h-11 shadow-sm px-6 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+              {...register("password", { 
+                required: "رمز عبور را وارد کنید.",
+                minLength: {
+                  value: 6,
+                  message: "رمز عبور باید حداقل 6 کاراکتر باشد"
+                }
+              })}
+              type={showPassword ? "text" : "password"}
+              id="password"
+              aria-invalid={errors.password ? "true" : "false"}
+              aria-describedby={errors.password ? "password-error" : undefined}
+              disabled={isLoading}
+            />
+            {errors.password && (
+              <p
+                id="password-error"
+                className="text-red-500 text-sm mt-1"
+                role="alert"
               >
-                <div
-                  className="flex gap-2"
-                >
-                  <Image 
-                    src="/icons/lock-icon.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
-                  رمز عبور
-                </div>
-              </label>              
-              <input 
-                className="w-full border border-[#C3C3C3] rounded-2xl h-11 shadow-sm px-6"
-                {...register("password", { required: "رمز عبور را وارد کنید." })}
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="password"
-                required
-              />
-              {errors.password && (
-                <p
-                  className="text-red-500 text-sm mt-1"
-                >
-                  {errors.password.message}
-                </p>
-              )}                
-            </div>
+                {errors.password.message}
+              </p>
+            )}
 
             <button
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors"
               type="button"
               onClick={() => setShowPassword(prev => !prev)}
+              aria-label={showPassword ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"}
+              disabled={isLoading}
             >
-              <Image
-                className="object-cover"
-                src={showPassword ? "/icons/hide-eye-icon.svg" : "/icons/eye-icon.svg"}
-                alt=""
-                width={17}
-                height={12}
-              />
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
 
-          {/* Errors */}
-          {loginStatus.isError && (
-            <p
-              className="text-red-600 text-sm font-medium"
-            >
-              {(loginStatus.error as Error)?.message}
-            </p>
-          )}
-
           {/* Submit Button */}
           <Button
-            className={`${ loginStatus.isPending ? "cursor-not-allowed" : "" } shadow-md`}
+            className={`${isLoading ? "cursor-not-allowed opacity-70" : ""} shadow-md`}
             variant="primary"
             type="submit"
-            disabled={loginStatus.isPending}
+            disabled={isLoading}
           >
-            {loginStatus.isPending ? "در حال ورود" : "ورود"}
+            {isLoading ? "در حال ورود..." : "ورود"}
           </Button>
         </form>
 
         {/* Forgot Password & Login Type Toggle */}
-        <div
-          className="w-full flex justify-between px-1 mt-2"
-        >
+        <div className="w-full flex justify-between px-1 mt-2">
           <button
-            className="text-[#696969] text-sm hover:text-black transition-colors"
+            className="text-[#696969] text-sm hover:text-black transition-colors disabled:opacity-50"
+            type="button"
+            disabled={isLoading}
           >
             فراموشی رمز عبور
           </button>
 
           <button
-            className="text-[#696969] text-sm text-right hover:text-black transition-colors"
+            className="text-[#696969] text-sm text-right hover:text-black transition-colors disabled:opacity-50"
             type="button"
             onClick={() => setLoginType(loginType === "email" ? "phone-number" : "email")}
+            disabled={isLoading}
           >
             {loginType === "email" ? "ورود با شماره موبایل" : "ورود با ایمیل"}
           </button>
         </div>
 
         {/* Policy Agreement */}
-        <div
-          className="mt-9.5 self-center text-right"
-        >
-          <p
-            className="text-sm text-center"
-          >
-          با ورود به هوش مصنوعی پیکاتک، شما قوانین و مقررات استفاده را می‌پذیرید.
+        <div className="mt-10 self-center text-center">
+          <p className="text-sm text-[#696969]">
+            با ورود به هوش مصنوعی پیکاتک، شما قوانین و مقررات استفاده را می‌پذیرید.
           </p>
         </div>
       </div>

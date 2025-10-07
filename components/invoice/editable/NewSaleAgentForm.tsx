@@ -7,14 +7,14 @@ import { toast } from "sonner"
 import Button from "../../ui/Buttons"
 import Image from "next/image"
 import { useFormModeStore } from "@/stores/useFormModeStore"
-import { useAuthStore } from "@/stores/useAuthStore"
+import { useAuthUser } from "@/stores/useAuthStore"
 
 
 const NewSaleAgentForm = () => {
     const { saleAgent, setSaleAgent, resetSaleAgent } = useInvoiceStore()
     const closeForm = useFormModeStore((state) => state.resetAll)
     const createSaleAgentMutation = useCreateSaleAgent()
-    const { userId } = useAuthStore()
+    const user = useAuthUser()
 
 
 
@@ -31,7 +31,7 @@ const NewSaleAgentForm = () => {
         phone_number:  saleAgent.phone_number,
         national_id: saleAgent.national_id,
         address: saleAgent.address,
-        user_id: userId
+        user_id: user?.userId
       },
       {
         onSuccess: () => {

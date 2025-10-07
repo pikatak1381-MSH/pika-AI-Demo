@@ -6,15 +6,21 @@ import { useCreateClient } from "@/hooks/clientHooks/useCreateClient"
 import { toast } from "sonner"
 import Button from "../../ui/Buttons"
 import Image from "next/image"
-import { useFormModeStore } from "@/stores/useFormModeStore"
-import { useAuthStore } from "@/stores/useAuthStore"
+import { useAuthUser } from "@/stores/useAuthStore"
+import { useModalStore } from "@/stores/useModalStore"
 
 
 const NewClientForm = () => {
     const { client, setClient, resetClient } = useInvoiceStore()
-    const closeForm = useFormModeStore((state) => state.resetAll)
+    const closeForm = useModalStore((state) => state.close)
     const createClientMutation = useCreateClient()
-    const { userId } = useAuthStore()
+    const user = useAuthUser()
+
+    if (!user) {
+        <div className="text-gray-400 text-sm text-center py-8">
+            لطفا وارد اکانت شوید
+        </div>    
+    }
 
     const handleCreateClient = (e: React.FormEvent) => {
         e.preventDefault()
@@ -30,7 +36,7 @@ const NewClientForm = () => {
             phone_number:  client.phone_number,
             national_id: client.national_id,
             delivery_address: client.delivery_address,
-            user_id: userId
+            user_id: user?.userId
         },
         {
             onSuccess: () => {

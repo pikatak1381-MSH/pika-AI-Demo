@@ -1,21 +1,22 @@
 "use client"
-import { useAuthStore } from "@/stores/useAuthStore"
+
+import { useAuthUser } from "@/stores/useAuthStore"
+import { useModalStore } from "@/stores/useModalStore"
 
 interface ProfileBoxProps {
   sidebarOpen: boolean
-  toggleModal?: () => void
 }
 
 
-const ProfileButton: React.FC<ProfileBoxProps> = ({ sidebarOpen, toggleModal }) => {
-  const { preferredName } = useAuthStore()
-
+const ProfileButton: React.FC<ProfileBoxProps> = ({ sidebarOpen }) => {
+  const user = useAuthUser()
+  const { openProfile } = useModalStore()
 
   return (
     <>
       <button
         className="flex gap-2 items-center"
-        onClick={toggleModal}
+        onClick={openProfile}
       >
         <div
           className="flex items-center justify-center p-1 rounded-full bg-[#80C0FF] text-sm text-white w-8 h-8"
@@ -30,7 +31,7 @@ const ProfileButton: React.FC<ProfileBoxProps> = ({ sidebarOpen, toggleModal }) 
             <span
               className="text-sm text-[#1E1E1E]"
             >
-              {preferredName}
+              {user?.preferredName}
             </span>
             
             <span

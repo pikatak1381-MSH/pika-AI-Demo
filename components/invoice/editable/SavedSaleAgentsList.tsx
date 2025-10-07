@@ -10,15 +10,15 @@ import { toast } from "sonner"
 import { useState, useRef } from "react"
 import { SaleAgentInfo } from "@/lib/types"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuthStore } from "@/stores/useAuthStore"
+import { useAuthUser } from "@/stores/useAuthStore"
 
 const SavedSaleAgentsList = () => {
     const [selectedSaleAgent, setSelectedSaleAgent] = useState<SaleAgentInfo | null>(null)
     const [open, setOpen] = useState(false)
     const triggerRef = useRef<HTMLButtonElement | null>(null)
-    const { userId } = useAuthStore()
+    const user = useAuthUser()
     const setMode = useFormModeStore((state) => state.setMode)
-    const { data: saleAgents, isLoading } = useGetSaleAgents(userId)
+    const { data: saleAgents, isLoading } = useGetSaleAgents(user?.userId)
     const { setSaleAgent } = useInvoiceStore()
     const deleteMutation = useDeleteSaleAgent()
 

@@ -1,74 +1,144 @@
 "use client"
 
-import { useUserConversations } from "@/hooks/message/useUserConversations"
-import { useRouter } from "next/navigation"
-import { useChatUIStore } from "@/stores/useChatUIStore"
+import { useAllUserConversations } from "@/hooks/message/useAllUserConversations"
 import { useEffect, useRef } from "react"
+import { useAuthUser } from "@/stores/useAuthStore"
 
 
 const ChatHistory = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useUserConversations()
-  const { setActiveConversation, activeConversationId } = useChatUIStore()
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const loaderRef = useRef<HTMLDivElement | null>(null)
-  const router = useRouter()
+  const user = useAuthUser()
+  const {
+    conversations,
+    pagination,
+    isLoading,
+    isError,
+    error,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useAllUserConversations({
+    user_id: user?.userId,
+    limit: 10,
+  })
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const observerTarget = useRef<HTMLDivElement>(null)
+
+  // Intersection Observer for infinite scroll
   useEffect(() => {
-    if (!loaderRef.current) return
-
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage) {
+        // When the sentinel element is visible and we have more pages
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage()
         }
       },
-      { threshold: 1.0 }
+      {
+        root: scrollContainerRef.current,
+        rootMargin: "100px", // Load before reaching the bottom
+        threshold: 0.1,
+      }
     )
 
-    observer.observe(loaderRef.current)
-    return () => observer.disconnect()
-  }, [fetchNextPage, hasNextPage])
-
-  useEffect(() => {
-    // Scrolling to top whenever data changes
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0
+    const currentTarget = observerTarget.current
+    if (currentTarget) {
+      observer.observe(currentTarget)
     }
-  }, [data])
 
-  const handleSelectConversation = (convId: number) => {
-    setActiveConversation(convId)
-    router.push(`/chat/${convId}`)
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
+      }
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+  if (!user) {
+    return (
+      <aside className="w-64  border-r border-gray-700 p-4">
+        <div className="text-gray-400 text-sm text-center py-8">
+          لطفا وارد اکانت شوید تا گفتگوها را ببینید
+        </div>
+      </aside>
+    )
   }
 
-  if (status === "pending") return <p className="text-sm text-gray-400 mt-2">در حال بارگذاری...</p>
-  if (status === "error") return <p className="text-sm text-red-500 mt-2">خطا در بارگذاری گفت‌و‌گوها</p>
+  if (isLoading) {
+    return (
+      <aside className="w-64  border-r border-gray-700 p-4">
+        <div className="space-y-2">
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              className="h-12 bg-gray-800 rounded animate-pulse"
+            />
+          ))}
+        </div>
+      </aside>
+    )
+  }
 
-  const conversations = data?.pages.flat() ?? []
-
+  if (isError) {
+    return (
+      <aside className="w-64  border-r border-gray-700 p-4">
+        <div className="text-red-400 text-sm">
+          :خطا {error instanceof Error ? error.message : "مشکل در بارگیری گفتگوها"}
+        </div>
+      </aside>
+    )
+  }
+  
   return (
-    <div 
-      className="flex flex-col gap-1 px-1"
-      ref={scrollRef}
-    >
-      {conversations.map((conv) => (
-        <button
-          key={conv.conversation_id}
-          onClick={() => handleSelectConversation(conv.conversation_id)}
-          className={`w-full text-right px-2 py-1 rounded hover:bg-gray-100 transition-colors duration-200 ${
-            activeConversationId === conv.conversation_id ? "bg-gray-200 font-semibold" : ""
-          }`}
-        >
-          گفت‌و‌گو {conv.conversation_id} 
-        </button>
-      ))}
+    <div>
+      <div className="p-4 border-b border-gray-700">
+        <h2 className="text-white font-semibold">گفتگوها</h2>
+        {pagination && (
+          <p className="text-gray-400 text-xs mt-1">
+            {conversations.length} of {pagination.total_conversations}
+          </p>
+        )}
+      </div>
 
-      {/* Loader div */}
       <div
-        className="h-8 flex items-center justify-center"
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-2"
       >
-        {isFetchingNextPage && (
-          <p className="text-xs text-gray-400">در بارگذاری بیشتر...</p>
+        {conversations.length === 0 ? (
+          <div className="text-gray-400 text-sm text-center py-8">
+            گتفگویی یافت نشد
+          </div>
+        ) : (
+          <>
+            {conversations.map((conversation) => (
+              <div
+                key={conversation.conversation_id}
+                className="p-3  rounded  cursor-pointer transition-colors"
+              >
+                <div className="text-white text-sm font-medium">
+                  گفتگو {conversation.conversation_id}
+                </div>
+                <div className="text-gray-400 text-xs mt-1">
+                  {new Date(conversation.updated_at).toLocaleDateString()}
+                </div>
+              </div>
+            ))}
+
+            {/* Sentinel element for infinite scroll */}
+            <div ref={observerTarget} className="h-4" />
+
+            {/* Loading indicator */}
+            {isFetchingNextPage && (
+              <div className="py-4 text-center">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+              </div>
+            )}
+
+            {/* End of list indicator */}
+            {!hasNextPage && conversations.length > 0 && (
+              <div className="text-gray-500 text-xs text-center py-4">
+                انتهای گفتگوها
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

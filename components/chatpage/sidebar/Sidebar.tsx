@@ -1,7 +1,7 @@
 "use client"
 
-import { motion, AnimatePresence, type Transition } from "framer-motion"
-import { useState, useEffect, useRef } from "react"
+import { motion, type Transition } from "framer-motion"
+import { useState } from "react"
 import AnimatedContainer from "@/components/ui/AnimatedContainer"
 import NewConversationButton from "./NewConversationButton"
 import ProfileButton from "./ProfileButton"
@@ -9,39 +9,20 @@ import TokenBox from "./TokenBox"
 import SidebarHeader from "./SidebarHeader"
 import SearchButton from "./SearchButton"
 import ProformalInvoiceButton from "./ProformalInvoiceButton"
-import ProfileModal from "./ProfileModal"
 import { SidebarChatHistory } from "./SidebarChatHistory"
 
 const transition: Transition = { type: "spring", stiffness: 300, damping: 30 }
 
 
 const Sidebar = () => {
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [isHovered, setIsHovered] = useState<boolean>(false)
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
-    const profileModalRef = useRef<HTMLDivElement>(null)
+
 
     const toggleSidebar = () => {
         setSidebarOpen(prev => !prev)
     }
 
-    const toggleProfileModal = () => {
-        setIsModalOpen(prev => !prev)
-    }
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                profileModalRef.current &&
-                !profileModalRef.current.contains(event.target as Node)
-            ) {
-                setIsModalOpen(false)
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside)
-        return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
 
     return (
         <motion.aside
@@ -107,7 +88,6 @@ const Sidebar = () => {
             {/* Bottom Section: Profile + Token */}
             <div
                 className="flex items-center justify-between hover:bg-[#EFEFEF] p-1 rounded-lg cursor-pointer mt-auto z-50 flex-shrink-0"
-                onClick={() => toggleProfileModal()}
             >
                 <ProfileButton
                     sidebarOpen={sidebarOpen}
@@ -116,14 +96,6 @@ const Sidebar = () => {
                 {sidebarOpen && (
                     <TokenBox />
                 )}
-
-                <AnimatePresence>
-                        <ProfileModal 
-                            forwardedRef={profileModalRef}
-                            isModalOpen={isModalOpen}
-                        />
-                </AnimatePresence>
-
             </div>
         </motion.aside>
     )

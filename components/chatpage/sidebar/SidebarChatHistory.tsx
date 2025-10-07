@@ -1,45 +1,60 @@
-import { useEffect, useRef, useCallback } from "react"
-import { useAllConversations } from "@/hooks/message/useAllUserConversations"
+import { useEffect, useRef } from "react"
+import { useAuthUser } from "@/stores/useAuthStore"
+import { useAllUserConversations } from "@/hooks/message/useAllUserConversations"
 
 export function SidebarChatHistory() {
+  const user = useAuthUser()
   const {
     conversations,
-    totalCount,
     isLoading,
-    isLoadingMore,
     isError,
-    canLoadMore,
-    loadMore,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     refetch,
-  } = useAllConversations()
+  } = useAllUserConversations({
+    user_id: user?.userId,
+    limit: 10,
+  })
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const observerTarget = useRef<HTMLDivElement>(null)
 
   // Intersection Observer for infinite scroll
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [target] = entries
-      if (target.isIntersecting && canLoadMore && !isLoadingMore) {
-        loadMore()
-      }
-    },
-    [canLoadMore, isLoadingMore, loadMore]
-  )
-
   useEffect(() => {
-    const element = observerTarget.current
-    if (!element) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // When the sentinel element is visible and we have more pages
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      {
+        root: scrollContainerRef.current,
+        rootMargin: "100px", // Load before reaching the bottom
+        threshold: 0.1,
+      }
+    )
 
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "100px", // Loading before user reaches the end
-      threshold: 0.1,
-    })
+    const currentTarget = observerTarget.current
+    if (currentTarget) {
+      observer.observe(currentTarget)
+    }
 
-    observer.observe(element)
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
+      }
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-    return () => observer.disconnect()
-  }, [handleObserver])
+
+
+  if (!user) {
+    <div className="text-gray-400 text-sm text-center py-8">
+      لطفا وارد اکانت شوید تا گفت‌وگوها را ببینید
+    </div>    
+  }
 
   if (isLoading) {
     return (
@@ -60,7 +75,7 @@ export function SidebarChatHistory() {
     return (
       <div className="p-4">
         <div className="text-red-500 text-sm mb-2">
-          مشکل در بارگیری گفگتوها
+          مشکل در بارگیری گفت‌وها
         </div>
         <button
           onClick={() => refetch()}
@@ -76,7 +91,7 @@ export function SidebarChatHistory() {
     <div className="h-full overflow-y-auto overflow-x-hidden">
         {conversations.length === 0 ? (
           <div className="p-4 text-gray-500 text-sm text-center">
-            هیچ گفتگویی یافت نشد
+            گفت‌وگویی یافت نشد
           </div>
         ) : (
           <div className="space-y-1 p-2">
@@ -84,20 +99,23 @@ export function SidebarChatHistory() {
               <ConversationItem key={conv.conversation_id} conversation={conv} />
             ))}
 
-            {/* Loading indicator when fetching more */}
-            {isLoadingMore && (
-              <div className="p-2 text-center">
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            {/* Sentinel element for infinite scroll */}
+            <div ref={observerTarget} className="h-4" />
+
+            {/* Loading indicator */}
+            {isFetchingNextPage && (
+              <div className="py-4 text-center">
+                <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
               </div>
-            )}
+            )}            
 
             {/* Intersection observer target */}
             <div ref={observerTarget} className="h-4" />
 
-            {/* Show count */}
-            {!canLoadMore && conversations.length > 0 && (
-              <div className="p-2 text-center text-xs text-gray-500 mt-2">
-                {conversations.length} از {totalCount} گفت‌و‌گو
+            {/* End of list indicator */}
+            {!hasNextPage && conversations.length > 0 && (
+              <div className="text-gray-500 text-xs text-center py-4">
+                انتهای گفت‌وگوها
               </div>
             )}
           </div>
@@ -131,7 +149,7 @@ function ConversationItem({ conversation }: ConversationItemProps) {
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm truncate flex-1">
-          گفتگو {conversation.conversation_id}
+          گفت‌وگو {conversation.conversation_id}
         </span>
         <span className="text-xs text-gray-500 ml-2">{formattedDate}</span>
       </div>

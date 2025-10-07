@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { SaleAgentInfo } from "@/lib/types"
 
-export function useGetSaleAgents(userId: string | null) {
+export function useGetSaleAgents(userId: string | undefined) {
     return useQuery<SaleAgentInfo[]>({
         queryKey: ["sale-agents", userId],
         queryFn: async () => {

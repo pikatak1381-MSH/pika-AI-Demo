@@ -16,12 +16,6 @@ const ClientForm = () => {
     <div
       className="min-h-96 flex flex-col gap-6 overflow-x-hidden"
     >
-      <p
-        className="font-medium"
-      >
-        به خریدار
-      </p>      
-      
       <SavedClientsList />
       
       {/* Un-editable client form */}

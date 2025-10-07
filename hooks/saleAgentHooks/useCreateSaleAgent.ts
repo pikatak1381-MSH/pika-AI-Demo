@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { SaleAgentInfo } from "@/lib/types"
 
 interface CreateSaleAgentArgs extends SaleAgentInfo {
-    user_id: string | null
+    user_id: string | undefined
 }
 
 

@@ -2,22 +2,27 @@
 
 import { useState, useRef } from "react"
 import { useAuth } from "@/hooks/auth/useAuth"
-import { useConversation1 } from "@/hooks/message/useConversation1"
+import { useConversation } from "@/hooks/message/useConversation"
 import AnimatedContainer from "@/components/ui/AnimatedContainer"
 import ShortCutButtons from "@/components/chatpage/chatsection/ShortCutButtons"
-import SkeletonUi from "@/components/ui/skeletons/SkeletonUi"
 import { ArrowUp, Plus, ClipboardList } from "lucide-react"
+import WelcomePageMessages from "@/components/ui/WelcomePageMessages"
+import { AuthLoadingScreen } from "@/components/auth/AuthLoadingScreen"
+
 
 const WelcomeChatPage = () => {
-    const { createNewConversation, sending } = useConversation1()
-    const { isReady } = useAuth()
+    const { createNewConversation, sending } = useConversation()
+    const { isHydrated } = useAuth({
+        requireAuth: true
+    })
     const [input, setInput] = useState("")
     const [isCreating, setIsCreating] = useState(false)
+    
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-    if (!isReady) {
-        return <SkeletonUi />
+    if (!isHydrated) {
+        return <AuthLoadingScreen />
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +33,7 @@ const WelcomeChatPage = () => {
         setIsCreating(true)
         
         try {
-            // Clear input immediately for better UX
+            // Clearing input immediately for better UX
             setInput("")
             if (textareaRef.current) {
                 textareaRef.current.style.height = "40px"
@@ -57,12 +62,24 @@ const WelcomeChatPage = () => {
                 variant="zoom"
                 delay={0.5}
             >
-                <p className="text-2xl font-bold text-center my-4">
-                    چطور می‌توانم به شما کمک کنم؟
-                </p>
+                <div
+                    className="flex flex-col gap-2 text-lg items-center justify-center mb-6"
+                >
+                    <div
+                        className="flex items-center"
+                    >
+                        <span>پیکا اِی آی کمکت میکنه تو</span>
+                        <WelcomePageMessages intervalTimeout={3000} minWidth="170px"/>
+                    </div>
+                    <p
+                        className="text-sm text-[#656565]"
+                    >
+                        سلام 👋 به پیکا ای آی  خوش آمدید! سوال خود را بپرسید 
+                    </p>
+                </div>
 
                 <form
-                    className="w-full max-w-3xl flex items-center justify-between p-1.5 border border-[#939393] rounded-4xl bg-[#FBFBFF] shadow-[5px_5px_10px_5px_#0000000D] hover:bg-[#E0E0E0] transition-colors duration-700 mx-auto z-20 overflow-hidden"
+                    className="w-full max-w-3xl flex items-center justify-between py-1 px-4 border border-[#939393] rounded-4xl bg-[#FBFBFF] shadow-[5px_5px_10px_5px_#0000000D] hover:bg-[#E0E0E0] transition-colors duration-700 mx-auto z-20 overflow-hidden"
                     onSubmit={handleSubmit}
                 >
                     {/* Input */}
@@ -114,7 +131,6 @@ const WelcomeChatPage = () => {
                         </button>
                     </div>
                 </form>
-
                 <ShortCutButtons />
             </AnimatedContainer>
         </div>

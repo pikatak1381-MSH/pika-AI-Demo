@@ -1,126 +1,227 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
-import { useAuthStore } from "@/stores/useAuthStore"
+import { useAuthStore, AuthUser } from "@/stores/useAuthStore"
+import { 
+    authService, 
+    AuthError, 
+    LoginRequest, 
+    SignUpRequest,
+    AuthResponse 
+} from "@/lib/api/auth.service"
 
 interface UseAuthOptions {
-    requireAuth?: boolean // for protected pages
-    redirectIfAuthenticated?: string // for login/signup pages
+    requireAuth?: boolean
+    redirectIfAuthenticated?: string
+    redirectAfterLogin?: string
+    redirectAfterSignup?: string
 }
 
-async function loginRequest(email: string, password: string) {
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  })
-
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.message || "Login failed")
-
-  return data
+type AuthMutationContext = {
+    onSuccess?: () => void
+    onError?: (error: AuthError) => void
 }
 
-async function logoutRequest(token: string | undefined) {
-  if (!token) return
-  const res = await fetch("/api/auth/logout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}))
-    throw new Error(data.message || "Logout failed")
-  }
-}
+export const useAuth = (options: UseAuthOptions = {}) => {
+    const {
+        requireAuth = false,
+        redirectIfAuthenticated,
+        redirectAfterLogin = "/chat",
+        redirectAfterSignup = "/chat",
+    } = options
 
-export const useAuth = ({ 
-    requireAuth = false, redirectIfAuthenticated 
-}: UseAuthOptions = {}) => {
-    const [isReady, setIsReady] = useState(false)
-    const { userId, token, isAuthenticated, setAuth, clearAuth} = useAuthStore()
     const router = useRouter()
+    const { user, token, isHydrated, isAuthenticated, setAuth, clearAuth } = useAuthStore()
+    
+    // Preventing multiple redirects
+    const hasRedirected = useRef(false)
 
-
-  /* ---------------- Hydration ---------------- */
+    /* ---------------- Route Protection ---------------- */
     useEffect(() => {
-    // If already hydrated, mark ready
-        if (useAuthStore.persist.hasHydrated()) {
-            setIsReady(true)
-        } else {
-            // Otherwise, wait for hydration
-            const unsubscribe = useAuthStore.persist.onFinishHydration(() => setIsReady(true))
-            return unsubscribe
-        }
-    }, [])
+        if (!isHydrated || hasRedirected.current) return
 
-  /* ---------------- Cross-tab sync ---------------- */
-    useEffect(() => {
-        const handler = () => setIsReady((prev) => !prev)
-        window.addEventListener("storage", handler)
-        return () => window.removeEventListener("storage", handler)
-    }, [])
+        const authenticated = isAuthenticated()
 
-  /* ---------------- Route protection / redirects ---------------- */
-    useEffect(() => {
-        if (!isReady) return
-        if (requireAuth && !isAuthenticated()) {
+        if (requireAuth && !authenticated) {
+            hasRedirected.current = true
             router.replace("/login")
-        }
-        if (redirectIfAuthenticated && isAuthenticated()) {
+        } else if (redirectIfAuthenticated && authenticated) {
+            hasRedirected.current = true
             router.replace(redirectIfAuthenticated)
         }
-    }, [isReady, isAuthenticated, requireAuth, redirectIfAuthenticated, router])
+    }, [isHydrated, isAuthenticated, requireAuth, redirectIfAuthenticated, router])
 
-    /* ---------------- Mutations ---------------- */
-    const loginMutation = useMutation({
-        mutationFn: ({ email, password }: { email: string; password: string }) =>
-        loginRequest(email, password),
-        onSuccess: (data) => {
-        setAuth({
+    /* ---------------- Cross-tab Syncing ---------------- */
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            // Only responding to auth-storage changes
+            if (e.key === "auth-storage" || e.key === null) {
+                // Triggering re-render by reading from store
+                useAuthStore.getState()
+            }
+        }
+
+        window.addEventListener("storage", handleStorageChange)
+        return () => window.removeEventListener("storage", handleStorageChange)
+    }, [])
+
+    /* ---------------- Transforming API Response ---------------- */
+    const transformAuthResponse = useCallback((data: AuthResponse) => {
+        const user: AuthUser = {
             userId: data.user_id,
-            token: data.session_token,
             email: data.email,
             preferredName: data.preferred_name,
+        }
+
+        setAuth({
+            user,
+            token: data.session_token,
             expiresAt: data.expires_at,
         })
-        if (redirectIfAuthenticated) {
-            router.replace(redirectIfAuthenticated)
+
+        return { user, token: data.session_token }
+    }, [setAuth])
+
+  /* ---------------- Login Mutation ---------------- */
+  const loginMutation = useMutation({
+    mutationFn: (credentials: LoginRequest) => authService.login(credentials),
+    onSuccess: (data, _, context) => {
+        transformAuthResponse(data)
+      
+        // Calling custom onSuccess if provided
+        if ((context as AuthMutationContext)?.onSuccess) {
+            ;(context as AuthMutationContext).onSuccess!()
+        } else {
+            // Default behavior
+            router.push(redirectAfterLogin)
         }
+    },
+    onError: (error: AuthError, _, context) => {
+        // Calling custom onError if provided
+        ;(context as AuthMutationContext)?.onError?.(error)
+    },
+  })
+
+    /* ---------------- SignUp Mutation ---------------- */
+    const signUpMutation = useMutation({
+        mutationFn: (data: SignUpRequest) => authService.signUp(data),
+        onSuccess: (data, _, context) => {
+            transformAuthResponse(data)
+            
+            // Calling custom onSuccess if provided
+            if ((context as AuthMutationContext)?.onSuccess) {
+                ;(context as AuthMutationContext).onSuccess!()
+            } else {
+                // Default behavior
+                router.push(redirectAfterSignup)
+            }
+        },
+        onError: (error: AuthError, _, context) => {
+            // Calling custom onError if provided
+            ;(context as AuthMutationContext)?.onError?.(error)
         },
     })
 
+    /* ---------------- Logout Mutation ---------------- */
     const logoutMutation = useMutation({
-        mutationFn: () => logoutRequest(token),
+        mutationFn: async () => {
+            if (token) {
+                await authService.logout(token)
+            }
+        },
         onSettled: () => {
-        clearAuth()
-        useAuthStore.persist.clearStorage?.()
-        router.replace("/login")
+            clearAuth()
+            // Clearing persisted storage
+            useAuthStore.persist.clearStorage?.()
+            hasRedirected.current = false
+            router.replace("/login")
         },
     })
+
+    /* ---------------- Refreshing Token ---------------- */
+    const refreshMutation = useMutation({
+        mutationFn: () => {
+            if (!token) throw new AuthError("No token to refresh")
+            return authService.refreshToken(token)
+        },
+            onSuccess: (data) => {
+            transformAuthResponse(data)
+        },
+        onError: () => {
+            // If refresh fails, logout
+            clearAuth()
+            router.replace("/login")
+        },
+    })
+
+    /* ---------------- Auto Refreshing Before Expiry ---------------- */
+    useEffect(() => {
+        if (!isAuthenticated() || !useAuthStore.getState().expiresAt) return
+
+        const expiresAt = new Date(useAuthStore.getState().expiresAt!).getTime()
+        const now = Date.now()
+        const timeUntilExpiry = expiresAt - now
+        
+        // Refreshing 5 minutes before expiry
+        const refreshTime = timeUntilExpiry - 5 * 60 * 1000
+
+        if (refreshTime <= 0) {
+        // Already expired or about to expire
+        refreshMutation.mutate()
+        return
+        }
+
+        const timeoutId = setTimeout(() => {
+        refreshMutation.mutate()
+        }, refreshTime)
+
+        return () => clearTimeout(timeoutId)
+    }, [token, isAuthenticated, refreshMutation])
 
     return {
-        userId,
+        // State
+        user,
         token,
-        isAuthenticated,
-        isReady,
+        isAuthenticated: isAuthenticated(),
+        isHydrated,
+        isLoading: !isHydrated,
+
+        // Login
         login: loginMutation.mutate,
         loginAsync: loginMutation.mutateAsync,
         loginStatus: {
-            isPending: loginMutation.isPending,
-            isError: loginMutation.isError,
-            error: loginMutation.error,
+        isPending: loginMutation.isPending,
+        isError: loginMutation.isError,
+        isSuccess: loginMutation.isSuccess,
+        error: loginMutation.error,
         },
+
+        // SignUp
+        signUp: signUpMutation.mutate,
+        signUpAsync: signUpMutation.mutateAsync,
+        signUpStatus: {
+        isPending: signUpMutation.isPending,
+        isError: signUpMutation.isError,
+        isSuccess: signUpMutation.isSuccess,
+        error: signUpMutation.error,
+        },
+
+        // Logout
         logout: logoutMutation.mutate,
         logoutAsync: logoutMutation.mutateAsync,
         logoutStatus: {
-            isPending: logoutMutation.isPending,
-            isError: logoutMutation.isError,
-            error: logoutMutation.error,
+        isPending: logoutMutation.isPending,
+        isError: logoutMutation.isError,
+        error: logoutMutation.error,
+        },
+
+        // Refresh
+        refreshToken: refreshMutation.mutate,
+        refreshStatus: {
+        isPending: refreshMutation.isPending,
+        isError: refreshMutation.isError,
         },
     }
 }

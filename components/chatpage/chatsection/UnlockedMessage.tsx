@@ -5,11 +5,11 @@ import { ChatbotResponse } from "@/lib/types"
 import { useInvoiceStore } from "@/stores/useInvoiceStore"
 import OfferItem from "./OfferItem"
 import SendAction from "./SendAction"
-import InvoiceModal from "@/components/invoice/InvoiceModal"
 import FeedbackBox from "./FeedbackBox"
 import { motion } from "framer-motion"
 import AnimatedContainer from "@/components/ui/AnimatedContainer"
 import ResponseSkeleton from "@/components/ui/skeletons/ResponseSkeleton"
+import { useModalStore } from "@/stores/useModalStore"
 
 interface UnlockedMessageProps {
   response: ChatbotResponse
@@ -18,10 +18,10 @@ interface UnlockedMessageProps {
 
 const UnlockedMessage: React.FC<UnlockedMessageProps> = ({ response, messageId }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
   const { selectedProducts } = useInvoiceStore()
+  const { openInvoice } = useModalStore()
 
   const handleSend = () => {
     if (selectedProducts.length === 0) {
@@ -30,7 +30,12 @@ const UnlockedMessage: React.FC<UnlockedMessageProps> = ({ response, messageId }
     }
 
     setError(null)
-    setIsInvoiceModalOpen(true)
+
+    openInvoice({
+      response,
+      error,
+      messageId
+    })
   }
 
 
@@ -96,13 +101,6 @@ const UnlockedMessage: React.FC<UnlockedMessageProps> = ({ response, messageId }
               error={error}
             />
 
-            <InvoiceModal 
-              onClose={() => setIsInvoiceModalOpen(false)}
-              isInvoiceModalOpen={isInvoiceModalOpen}
-              messageId={messageId}
-              response={response}
-              error={error}
-            />
           </motion.div>
           <FeedbackBox />        
         </>

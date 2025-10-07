@@ -1,18 +1,23 @@
 "use client"
 
 import Button from "@/components/ui/Buttons"
-import CloseButton from "@/components/ui/CloseButton"
-import Image from "next/image"
 import { useState } from "react"
 import NewClientForm from "./NewClientForm"
 import NewSaleAgentForm from "./NewSaleAgentForm"
-import { useFormModeStore } from "@/stores/useFormModeStore"
+import { Entity, Mode } from "@/stores/useModalStore"
+import { UserRoundPlus } from "lucide-react"
+import CloseButton from "@/components/ui/CloseButton"
 
 
-const AddUserFormModal = () => {
+type AddUserFormModalProps = {
+    isOpen: boolean
+    entity: Entity
+    mode: Mode
+    onClose: () => void
+}
+
+const AddUserFormModal: React.FC<AddUserFormModalProps> = ({ onClose }) => {
     const [form, setForm] = useState<"client" | "saleAgent">("client")
-
-    const closeForm = useFormModeStore((state) => state.resetAll)
 
     return (
     /* underlay */
@@ -35,34 +40,29 @@ const AddUserFormModal = () => {
                         variant={form === "client" ? "primary" : "ghost"}
                         onClick={() => setForm("client")}
                     >
-                        <Image
-                            className="w-6 h-6 object-cover"
-                            src={form === "client" ? "/icons/white-add-user-icon.svg" : "/icons/blue-add-user-icon.svg"}
-                            alt=""
-                            width={24}
-                            height={24}
+                        <UserRoundPlus
+                            className={`${form === "client" ? "text-white" : "text-blue-500"}`}
+                            size={24}
                         />
                         اضافه کردن خریدار
                     </Button>
-
+                    
                     <Button
                         className="flex items-center gap-2"
                         variant={form === "saleAgent" ? "primary" : "ghost"}
                         onClick={() => setForm("saleAgent")}
                     >
-                        <Image
-                            className="w-6 h-6 object-cover"
-                            src={form === "saleAgent" ? "/icons/white-add-user-icon.svg" : "/icons/blue-add-user-icon.svg"}
-                            alt=""
-                            width={24}
-                            height={24}
+                        <UserRoundPlus
+                            className={`${form === "saleAgent" ? "text-white" : "text-blue-500"}`}
+                            size={24}
                         />
                         اضافه کردن فروشنده
                     </Button>
+
+                    <CloseButton
+                        onClick={() => onClose()}
+                    />
                 </div>
-                <CloseButton
-                    onClick={() => closeForm()}
-                />
             </div>
 
             {form === "client" ? (

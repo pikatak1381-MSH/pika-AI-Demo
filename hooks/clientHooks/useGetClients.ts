@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { ClientInfo } from "@/lib/types"
 
-export function useGetClients(userId: string | null) {
+export function useGetClients(userId: string | undefined) {
     return useQuery<ClientInfo[]>({
         queryKey: ["clients", userId],
         queryFn: async () => {

@@ -3,7 +3,7 @@ import { ClientInfo } from "@/lib/types"
 
 
 interface CreateClientArgs extends ClientInfo {
-    user_id: string | null
+    user_id: string | undefined
 }
 
 

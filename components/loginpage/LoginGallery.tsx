@@ -3,62 +3,12 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import AnimatedContainer from "../ui/AnimatedContainer"
-import { useState, /* useEffect, useRef  */} from "react"
+import { useState } from "react"
 
 
 const LoginGallery = () => {
-    const [isExpensive, /* setIsExpensive */] = useState<boolean>(false)
-    /* const [audioPlaying, setAuidoPlaying] = useState<boolean>(false) */
-
-    /* Tests */
-    /* const keysPressed = useRef<Set<string>>(new Set()) */
-    /* const audioRef = useRef<HTMLAudioElement>(null) */
-    
-    /* useEffect(() => {
-        const audio = audioRef.current
-
-        if (!audio) return
-
-        if (audioPlaying) {
-            audio.play()
-        } else {
-            audio.pause()
-            audio.currentTime = 0
-        }
-
-    }, [audioPlaying]) */
-
-    
-    /* useEffect(() => {
-        const activeExpensiveness = (e: KeyboardEvent) => {
-        
-        if (!e.key) return
-            keysPressed.current.add(e.key.toLowerCase())
-
-        if (
-            keysPressed.current.has("control") &&
-            keysPressed.current.has("q") &&
-            keysPressed.current.has("a")
-        ) {
-            e.preventDefault()
-            setIsExpensive(prev => !prev)
-            setAuidoPlaying(prev => !prev)
-        }
-        }
-
-        const deactiveExpensiveness = (e: KeyboardEvent) => {
-        if (!e.key) return
-        keysPressed.current.delete(e.key.toLowerCase())
-        }
-
-        window.addEventListener("keydown", activeExpensiveness)
-        window.addEventListener("keyup", deactiveExpensiveness)
-
-        return () => {
-        window.removeEventListener("keydown", activeExpensiveness);
-        window.removeEventListener("keyup", deactiveExpensiveness);
-        }
-    }, []) */
+    const [isExpensive] = useState<boolean>(false)
+ 
 
   return (
     <div
@@ -142,12 +92,6 @@ const LoginGallery = () => {
                     />
                 </motion.div>
             </AnimatedContainer>
-            {/* <audio 
-                ref={audioRef}
-                src="test/test-audio.mp3"
-                loop
-                onEnded={() => setAuidoPlaying(false)}
-            /> */}
         </div>
     </div>
   )

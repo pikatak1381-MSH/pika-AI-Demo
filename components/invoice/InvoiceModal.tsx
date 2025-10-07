@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useInvoiceStore } from "@/stores/useInvoiceStore"
 import { useSubmitProformalInvoice } from "@/hooks/message/useSubmitProformalInvoice"
@@ -10,38 +10,26 @@ import Button from "../ui/Buttons"
 import FinalInvoice from "./read-only/FinalInvoice"
 import { ChatbotResponse } from "@/lib/types"
 import { toast } from "sonner"
-import { useMessageStore } from "@/stores/useMessageStore"
-import Image from "next/image"
 import SaleAgentandClient from "./SaleAgentandClient"
 import CloseButton from "../ui/CloseButton"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 type InvoiceModalProps = {
-  onClose: () => void
-  isInvoiceModalOpen: boolean
+  isOpen: boolean
   response: ChatbotResponse
   error: string | null
   messageId: number | string
+  onClose: () => void
 }
 
 
-const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose, isInvoiceModalOpen, response, messageId }) => {
+const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, response, onClose }) => {
   /* 0 = Products, 1 = SaleAgent and Client, 2 = Preview */
   const [step, setStep] = useState(0)
 
   const { selectedProducts, header, saleAgent, client, footer, resetAll } = useInvoiceStore()
-  const { lockMessage } = useMessageStore()
   
   const submitMutation = useSubmitProformalInvoice()
-
-  /* Adding ESC event listener to close the modal */
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-
-    document.addEventListener("keydown", handleEsc)
-    return () => document.removeEventListener("keydown", handleEsc)
-  }, [onClose])
 
   /* Navigation handlers */
   const next = () => setStep((step) => Math.min(step + 1, 2))
@@ -68,7 +56,6 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose, isInvoiceModalOpen
           onClose()
           toast("پیش‌فاکتور با موفقیت ثبت شد. ✅")
           submitMutation.reset()
-          lockMessage(messageId, selectedProducts)
           resetAll()
         },
         onError: () => {
@@ -81,14 +68,14 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose, isInvoiceModalOpen
 
   return (
     <AnimatePresence>
-      {isInvoiceModalOpen && (
+      {isOpen && (
         /* Underlay */
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         >
           {/* Overlay */}
           <div
-            className="bg-white w-full max-w-4xl rounded-2xl shadow-xl relative mb-4 z-50 max-h-[95vh] overflow-auto"
+            className="bg-white w-full min-w-2xl max-w-4xl rounded-2xl shadow-xl relative mb-4 z-50 max-h-[95vh] overflow-auto"
           >
             {/* Sticky Header inside the Modal*/}
             <div
@@ -115,13 +102,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose, isInvoiceModalOpen
                         type="button"
                         onClick={() => (step === 0 ? onClose() : back())}
                       >
-                        <Image
-                          className="w-1.5 h-3"
-                          src="/icons/blue-right-arrow-icon.svg"
-                          alt=""
-                          width={6}
-                          height={12}
-                        />
+                        <ChevronRight />
                         مرحله قبل
                       </Button>
                     )}
@@ -132,18 +113,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose, isInvoiceModalOpen
                       type="button"
                       onClick={next}
                     >
-                      <Image
-                        className="w-1.5 h-3"
-                        src="/icons/white-left-arrow-icon.svg"
-                        alt=""
-                        width={6}
-                        height={12}
-                      />
+                      <ChevronLeft />
                       مرحله بعد
                     </Button>
                   </div>
                 )}
-
               </div>
             </div>
 

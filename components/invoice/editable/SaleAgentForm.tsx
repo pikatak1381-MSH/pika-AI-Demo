@@ -16,11 +16,6 @@ const SaleAgentForm = () => {
     <div
       className="flex flex-col gap-6 overflow-x-hidden"
     >
-      <p
-          className="font-medium"
-      >
-          از فروشنده
-      </p>
       <SavedSaleAgentsList />
       
       {/* Un-editable sale agent form */}

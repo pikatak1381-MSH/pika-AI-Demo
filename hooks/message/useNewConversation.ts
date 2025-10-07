@@ -8,13 +8,13 @@ export const useNewConversation = () => {
   const router = useRouter()
 
   const startNewConversation = () => {
-    // Step 1: Resetting store state
+    // Resetting store state
     setActiveConversation(null)
 
-    // Step 2: Clearing cached conversations
+    // Clearing cached conversations
     queryClient.removeQueries({ queryKey: ["conversation"] })
 
-    // Step 3: Redirect to welcome page
+    // Redirecting to welcome page
     router.push("/chat")
   }
 
