@@ -11,14 +11,13 @@ import { AuthLoadingScreen } from "@/components/auth/AuthLoadingScreen"
 
 
 const WelcomeChatPage = () => {
-    const { createNewConversation, sending } = useConversation()
+    const { sendMessageWithRedirect } = useConversation()
     const { isHydrated } = useAuth({
         requireAuth: true
     })
     const [input, setInput] = useState("")
-    const [isCreating, setIsCreating] = useState(false)
+    const [isSending, setIsSending] = useState(false)
     
-
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     if (!isHydrated) {
@@ -28,30 +27,26 @@ const WelcomeChatPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         const message = input.trim()
-        if (!message || isCreating) return
+        if (!message || isSending) return
 
-        setIsCreating(true)
+        setIsSending(true)
         
-        try {
-            // Clearing input immediately for better UX
-            setInput("")
-            if (textareaRef.current) {
-                textareaRef.current.style.height = "40px"
-            }
+        // Clear input immediately for better UX
+        setInput("")
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "40px"
+        }
 
-            // Create conversation with initial message
-            // The message will be sent after navigation
-            await createNewConversation({
-                autoRedirect: true,
-                initialMessage: message,
-            })
+        try {
+            // This will redirect immediately and handle the response in background
+            await sendMessageWithRedirect(message)
         } catch (error) {
-            console.error("Failed to create conversation:", error)
-            alert("مشکلی بوجود آمد، لطفا دوباره تلاش کنید.")
+            console.error("Failed to send message:", error)
             // Restore input on error
             setInput(message)
+            alert("مشکلی بوجود آمد، لطفا دوباره تلاش کنید.")
         } finally {
-            setIsCreating(false)
+            setIsSending(false)
         }
     }
 
@@ -101,7 +96,7 @@ const WelcomeChatPage = () => {
                                 }
                             }}
                             rows={1}
-                            disabled={isCreating}
+                            disabled={isSending}
                         />
                         <span className="w-full pointer-events-none absolute inset-0 flex items-center justify-start text-gray-400 peer-focus:hidden peer-not-placeholder-shown:hidden">
                             متن را بنویسید...
@@ -125,7 +120,7 @@ const WelcomeChatPage = () => {
                         <button
                             className="mr-1 rounded-full p-2 bg-[#D2D2D3] hover:bg-[#EFEFEF] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             type="submit"
-                            disabled={sending || isCreating || !input.trim()}
+                            disabled={isSending || !input.trim()}
                         >
                             <ArrowUp size={24} className="text-[#3F3F3F]" />
                         </button>

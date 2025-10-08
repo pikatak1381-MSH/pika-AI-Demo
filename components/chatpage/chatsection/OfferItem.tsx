@@ -8,7 +8,8 @@ import Checkbox from "@/components/ui/Checkbox"
 import ProductGalleryModal from "@/components/chatpage/ProductGalleryModal"
 import FarsiThousandSeperator from "@/components/ui/FarsiThousandSeperator"
 import Image from "next/image"
-import { Link } from "lucide-react"
+import { ChevronDown, ChevronUp, Link } from "lucide-react"
+import { Tooltip } from "@/components/ui/Tooltip"
 
 interface OfferItemProps {
   offer: ChatbotResponse["offered_product_answer"][number]["offers"][number]
@@ -21,6 +22,7 @@ const OfferItem: React.FC<OfferItemProps> = ({ offer, onToggle, expanded }) => {
 
   const { selectedProducts, addProduct, removeProduct } = useInvoiceStore()
 
+  console.log(offer)
   return (
     <div
       className="flex flex-col space-y-2"
@@ -77,9 +79,15 @@ const OfferItem: React.FC<OfferItemProps> = ({ offer, onToggle, expanded }) => {
               target="_blank"
               href={offer.url}
             >
-              <Link
-                size={12}
-              />
+              <Tooltip 
+                content={
+                  offer.url
+                    ? new URL(offer.url).hostname.replace(/^www\./, "")
+                    : "لینک نامشخص"
+                }
+              >
+                <Link size={12} />
+              </Tooltip>
             </a>
           </div>
         </div>
@@ -88,19 +96,13 @@ const OfferItem: React.FC<OfferItemProps> = ({ offer, onToggle, expanded }) => {
         <button
           className={`flex gap-2 items-center text-xs px-2 py-2 rounded-lg ${
             expanded
-              ? "bg-red-100 text-black hover:bg-red-300"
-              : "text-blue-500 hover:bg-blue-100"
+              ? "bg-red-100 text-black hover:bg-red-200"
+              : "text-gray-600 hover:bg-gray-200"
           } transition-colors`}
             onClick={onToggle}
         >
-            <Image
-                className="w-3 h-3"
-                src={expanded ? "/icons/black-close-icon.svg" : "/icons/blue-arrow-icon.svg"}
-                alt="" 
-                width={12}
-                height={12}
-            />
-            {expanded ? "بستن جزئیات" : "نمایش جزئیات"}
+          {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          {expanded ? "بستن جزئیات" : "نمایش جزئیات"}
         </button>     
       </div>
 

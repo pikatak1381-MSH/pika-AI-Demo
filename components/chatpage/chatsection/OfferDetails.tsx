@@ -18,7 +18,7 @@ const OfferDetails: React.FC<OfferDetailsProps> = ({ detailsOpen, specifications
       >
         {detailsOpen && (
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 pr-4 py-2 space-y-1 text-sm overflow-hidden"
+            className="grid grid-cols-1 sm:grid-cols-3 pr-4 py-2 space-y-1 overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -30,12 +30,12 @@ const OfferDetails: React.FC<OfferDetailsProps> = ({ detailsOpen, specifications
                 key={index}
               >
                 <span
-                  className="text-black font-semibold"
+                  className="text-black font-semibold text-xs"
                 >
                   {spec.AttributeName}:
                 </span>
                 <span
-                  className="text-zinc-600"
+                  className="text-zinc-600 text-xs"
                 >
                   {spec.Value}
                 </span>

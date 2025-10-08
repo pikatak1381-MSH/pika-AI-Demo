@@ -1,4 +1,4 @@
-import InvoiceDivider from "../read-only/InvoiceDivider"
+import InvoiceDivider from "./InvoiceDivider"
 import { useInvoiceStore } from "@/stores/useInvoiceStore"
 import FarsiText from "../../ui/FarsiText"
 

@@ -29,6 +29,20 @@ const iranSansFont = localFont({
 export const metadata: Metadata = {
   title: "Pika AI",
   description: "Pika AI Assistant",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png" },
+    ],
+    apple: "/apple-touch-icon",
+    other: [
+      {
+        rel: "manifest",
+        url: "/site.webmanifest"
+      }
+    ]
+  },
 }
 
 

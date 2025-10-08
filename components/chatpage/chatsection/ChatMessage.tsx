@@ -18,7 +18,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     messageId,
     selectedProductsSnapshot
 }) => {
-
     if (isLocked) {
         return (
             <LockedMessage 

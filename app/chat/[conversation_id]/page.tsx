@@ -24,6 +24,10 @@ const DynamicChatPage = () => {
   } = useConversation(routeId)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  
+  // Use a stable key that doesn't change during URL transitions
+  // This prevents ChatWindow from remounting
+  const chatWindowKey = useRef(activeConversationId || 'initial').current
 
   /* Auto-resize textarea */
   useEffect(() => {
@@ -57,22 +61,25 @@ const DynamicChatPage = () => {
     })
   }
 
-  // Show loading state while fetching messages
-  if (isLoadingMessages) {
+  // Show loading state only on initial load, not during transitions
+  if (isLoadingMessages && messages.length === 0) {
     return <SkeletonUi />
   }
 
   return (
     <>
-      <div className="w-full flex-1 flex flex-col items-center overflow-y-auto px-4 py-6">
+      <div 
+        className="w-full flex-1 flex flex-col items-center overflow-y-auto px-4 py-6 focus:outline-none focus:ring-0"
+        tabIndex={-1}
+      >
         <ChatWindow 
           messages={messages}
-          key={activeConversationId}
+          key={chatWindowKey}
         />
         <ScrollAnchor />
       </div>
 
-      <div className="w-full bg-[#f9f9f9] p-4">
+      <div className="w-full p-4">
         <form
           className="w-full max-w-3xl flex items-end gap-3 py-2 px-4 border border-[#939393] rounded-4xl bg-[#FBFBFF] shadow-[5px_5px_10px_5px_#0000000D] hover:bg-[#E0E0E0] transition-colors duration-300 mx-auto"
           onSubmit={handleSubmit}
